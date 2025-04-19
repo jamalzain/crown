@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>check serial number</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      text-align: center;
+      padding: 20px;
+    }
+    img.logo {
+      max-width: 200px;
+      margin-bottom: 20px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 1.1em;
+      margin: 10px;
+      width: 300px;
+    }
+    #reader {
+      width: 300px;
+      margin: auto;
+    }
+    .result {
+      font-size: 1.4em;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <img src="1ww-removebg-preview.png" alt="Logo" class="logo" />
+  <h2>insert the serial or scan it</h2>
+  <input type="text" id="inputNumber" placeholder="EX:123456789" />
+  <br>
+  <button onclick="checkNumber()">check serial number</button>
+  <button onclick="startScanner()">📷 scan</button>
+  <div id="reader" style="display:none;"></div>
+  <div class="result" id="result"></div>
+
+  <script>
+    // البيانات من ملف Excel بعد تحويلها إلى JSON
+    const dataFromExcel = [
+      "7706621461", "7712821991", "7511622594", "7813896560",
+      "7823973741", "7815795707", "7704172006", "7829114440",
+      "7714434346", "7700908619", "7858955163", "7827307300",
+      "7725753844", "7802788803", "7723963134", "7734354377",
+      "7733410900", "7735058121", "7731235155", "7703062453",
+      "7738313415", "7735913216", "7802679911", "7733672244",
+      "7733233172", "7733311064", "7733934352", "7730296648",
+      "7730644590", "7731350430", "7733147303", "7732954378",
+      "7733855152", "7731744050", "7734356120", "7732654373",
+      "7731522242", "7731244386", "7731744552", "7732232112",
+      "7732875503", "7733654314", "7733744003", "7735056118",
+      "7731524631", "7732112141", "7731020375", "7730520348"
+    ];
+
+    function checkNumber(input) {
+      const number = input || document.getElementById('inputNumber').value.trim();
+      const result = document.getElementById('result');
+      if (number === '') {
+        result.innerText = 'please insert serial number.';
+        return;
+      }
+      if (dataFromExcel.includes(number)) {
+        result.innerHTML = `<span style='color: green;'>✅ serial number is valid</span>`;
+      } else {
+        result.innerHTML = `<span style='color: red;'>❌ serial number is not valid</span>`;
+      }
+    }
+
+    function startScanner() {
+      document.getElementById('reader').style.display = 'block';
+      const html5QrCode = new Html5Qrcode("reader");
+      html5QrCode.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: 250
+        },
+        (decodedText) => {
+          html5QrCode.stop();
+          document.getElementById('reader').style.display = 'none';
+          document.getElementById('inputNumber').value = decodedText;
+          checkNumber(decodedText);
+        },
+        (errorMessage) => {
+          // تجاهل الأخطاء المؤقتة
+        })
+        .catch((err) => {
+          console.error("camera failed:", err);
+        });
+    }
+  </script>
+</body>
+</html>
